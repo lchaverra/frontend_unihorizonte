@@ -65,7 +65,7 @@ export class AuthSignUpComponent implements OnInit {
           if (response.status === 201) {
             this._router.navigateByUrl('/confirmation-required');
           }
-          else if (response.status === 400) {
+          else {
             // Re-enable the form
             this.signUpForm.enable();
 

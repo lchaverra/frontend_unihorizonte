@@ -4,7 +4,7 @@ import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
 import { environment } from 'environments/environment';
-import { UserSignUpData } from '../user/user.types';
+import { UserSignUpData, UserCredentials } from '../user/user.types';
 import { GenericResponse } from 'app/models/GenericResponse';
 @Injectable()
 export class AuthService {
@@ -47,28 +47,28 @@ export class AuthService {
    * @param credentials
    */
 
-  signIn(credentials: { email: string; password: string; }): Observable<GenericResponse> {
+  signIn(credentials: UserCredentials): Observable<GenericResponse> {
     // Throw error, if the user is already logged in
     if (this._authenticated) {
       throw new Error('User is already logged in.');
     }
 
-    const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-    return this._httpClient.post(environment.url + '/api/auth/sign-in', credentials, { headers }).pipe(
-      switchMap((response: any) => {
-        // Store the access token in the local storage
-        this.accessToken = response.acces_token;
+    return this._httpClient.post<GenericResponse>(environment.url + '/api/auth/sign-in', credentials)
+      .pipe(switchMap((response) => {
+        if (response.status === 201) {
+          const { name, surname, email, token } = response.data;
+          // Store the access token in the local storage
+          this.accessToken = token;
 
-        // Set the authenticated flag to true
-        this._authenticated = true;
+          // Set the authenticated flag to true
+          this._authenticated = true;
 
-        // Store the user on the user service
-        this._userService.user = response.email;
-        response['email'] = 'abarbosa@equitel.com.co';
+          // Store the user on the user service
+          this._userService.user = { id: token, email, name, surname, avatar: '', status: '' };
+        }
         // Return a new observable with the response
         return of(response);
-      })
-    );
+      }));
   }
 
   /**
@@ -76,10 +76,7 @@ export class AuthService {
    */
   signInUsingToken(): Observable<any> {
     // Renew token
-    return this._httpClient
-      .post('api/auth/refresh-access-token', {
-        accessToken: this.accessToken,
-      })
+    return this._httpClient.post('api/auth/refresh-access-token', { accessToken: this.accessToken })
       .pipe(catchError(() => of(false)),
         switchMap((response: any) => {
           // Store the access token in the local storage
@@ -117,7 +114,7 @@ export class AuthService {
    * @param user
    */
   signUp(user: UserSignUpData): Observable<GenericResponse> {
-    return this._httpClient.post<GenericResponse>(environment.url + 'api/auth/sign-up', user);
+    return this._httpClient.post<GenericResponse>(environment.url + '/api/auth/sign-up', user);
   }
 
   /**
@@ -125,10 +122,7 @@ export class AuthService {
    *
    * @param credentials
    */
-  unlockSession(credentials: {
-    email: string;
-    password: string;
-  }): Observable<any> {
+  unlockSession(credentials: UserCredentials): Observable<any> {
     return this._httpClient.post('api/auth/unlock-session', credentials);
   }
 

@@ -27,8 +27,8 @@
         <mat-form-field class="w-full">
           <mat-label>Correo</mat-label>
           <input id="email" matInput [formControlName]="'email'">
-          <mat-error *ngIf="signInForm.get('email').hasError('required')"> Email address is required </mat-error>
-          <mat-error *ngIf="signInForm.get('email').hasError('email')"> Please enter a valid email address</mat-error>
+          <mat-error *ngIf="signInForm.get('email').hasError('required')"> El correo es obligatorio </mat-error>
+          <mat-error *ngIf="signInForm.get('email').hasError('email')"> La dirección de correo no es valida</mat-error>
         </mat-form-field>
 
         <!-- Password field -->
@@ -45,7 +45,6 @@
 
         <!-- Actions -->
         <div class="inline-flex items-end justify-between w-full mt-1.5">
-          <mat-checkbox [color]="'primary'" [formControlName]="'rememberMe'"> Recordarme </mat-checkbox>
           <a class="text-md font-medium text-primary-500 hover:underline" [routerLink]="['/forgot-password']">
             ¿Has olvidado tu contraseña?
           </a>

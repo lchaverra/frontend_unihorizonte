@@ -1,7 +1,7 @@
 export interface GenericResponse {
   status: number;
   message: string;
-  responseData: any;
+  data: any;
   errorMessage: string;
   date: Date;
 };
