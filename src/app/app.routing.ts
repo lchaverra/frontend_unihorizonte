@@ -52,12 +52,8 @@ export const appRoutes: Route[] = [
   {
     path: '',
     component: LayoutComponent,
-    data: {
-      layout: 'empty'
-    },
-    children: [
-      { path: 'home', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule) },
-    ]
+    data: { layout: 'empty' },
+    children: [{ path: 'home', loadChildren: () => import('app/modules/landing/home/home.module').then(m => m.LandingHomeModule) }]
   },
 
   // Admin routes
